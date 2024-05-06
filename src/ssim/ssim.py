@@ -14,18 +14,16 @@ class SSIM(torch.nn.Module):
         self.window_size: float = window_size
         self.window_sigma: float = window_sigma
 
-    def __call__(self, img1, img2):
-        pass
-
+    # TODO: Implement forward method (SSIM calculation)
     def forward(self, img1: Tensor, img2: Tensor) -> Tensor:
-        return ssim()
+        pass
 
 
 # Create a 1D Gaussian window for SSIM calculation
 class GaussianWindow1D:
     def __init__(self, size, sigma):
-        self.size = size
-        self.sigma = sigma
+        self.size: float = size
+        self.sigma: float = sigma
         self.window = self._create_window()
 
     def _create_window(self):
@@ -43,9 +41,9 @@ class GaussianWindow1D:
 # Create a 2D Gaussian window for SSIM calculation
 class GaussianWindow2D:
     def __init__(self, size, sigma, channels=3):
-        self.size = size
-        self.sigma = sigma
-        self.channels = channels
+        self.size: float = size
+        self.sigma: float = sigma
+        self.channels: float = channels
         self.window = self._create_window()
 
     def _create_window(self):
@@ -59,11 +57,6 @@ class GaussianWindow2D:
 
     def __call__(self):
         return self.window
-
-
-def ssim(img1, img2, window_size=11, window_sigma=1.5, k1=0.01, k2=0.03):
-    # Calculate SSIM
-    pass
 
 
 def preprocess_img(img_path):
@@ -106,19 +99,20 @@ def visualize_kernels():
 
 
 if __name__ == "__main__":
-    # # Check if CUDA is available and set PyTorch to use GPU or CPU
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Check if CUDA is available and set PyTorch to use GPU or CPU
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # # Load and preprocess images
-    # img1 = preprocess_img("./images/image1.jpg").to(device)
-    # img2 = preprocess_img("./images/image2.jpg").to(device)
+    # Load and preprocess images
+    img1 = preprocess_img("./images/image1.jpg").to(device)
+    img2 = preprocess_img("./images/image2.jpg").to(device)
 
-    # # Calculate SSIM
-    # result = SSIM()
-    # # TODO: Calculate % similarity between the two images
+    # Calculate SSIM
+    ssim_module = SSIM(window_size=11, window_sigma=1.5).to(device)
+    result = 1 - SSIM(img1, img2)
+    # TODO: Calculate % similarity between the two images
 
-    # # Print final result
-    # print(f"Result: {result}")
+    # Print final result
+    print(f"Result: {result}")
 
     # Visualize 1D and 2D Gaussian kernels
     visualize_kernels()
