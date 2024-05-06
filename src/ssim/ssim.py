@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 
 # TODO: Implement SSIM class
 class SSIM(torch.nn.Module):
-    def __init__(self, window_size=11, window_sigma=1.5):
+    def __init__(self, window_size: int = 11, window_sigma: float = 1.5) -> None:
         super(SSIM, self).__init__()
-        self.window_size: float = window_size
+        self.window_size: int = window_size
         self.window_sigma: float = window_sigma
 
     # TODO: Implement forward method (SSIM calculation)
@@ -21,41 +21,43 @@ class SSIM(torch.nn.Module):
 
 # Create a 1D Gaussian window for SSIM calculation
 class GaussianWindow1D:
-    def __init__(self, size, sigma):
-        self.size: float = size
+    def __init__(self, size: int, sigma: float) -> None:
+        self.size: int = size
         self.sigma: float = sigma
-        self.window = self._create_window()
+        self.window: Tensor = self._create_window()
 
-    def _create_window(self):
-        axis = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
-        kernel = torch.exp(-(axis**2) / (2.0 * self.sigma**2))
+    def _create_window(self) -> Tensor:
+        axis: Tensor = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
+        kernel: Tensor = torch.exp(-(axis**2) / (2.0 * self.sigma**2))
         kernel /= torch.sum(kernel)
         kernel = kernel.view(1, 1, self.size, 1).repeat(1, 1, 1, 1)
 
         return kernel
 
-    def __call__(self):
+    def __call__(self) -> Tensor:
         return self.window
 
 
 # Create a 2D Gaussian window for SSIM calculation
 class GaussianWindow2D:
-    def __init__(self, size, sigma, channels=3):
-        self.size: float = size
+    def __init__(self, size: int, sigma: float, channels: int = 3) -> None:
+        self.size: int = size
         self.sigma: float = sigma
-        self.channels: float = channels
-        self.window = self._create_window()
+        self.channels: int = channels
+        self.window: Tensor = self._create_window()
 
-    def _create_window(self):
-        axis = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
+    def _create_window(self) -> Tensor:
+        axis: Tensor = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
+        xx: Tensor
+        yy: Tensor
         xx, yy = torch.meshgrid(axis, axis)
-        kernel = torch.exp(-(xx**2 + yy**2) / (2.0 * self.sigma**2))
+        kernel: Tensor = torch.exp(-(xx**2 + yy**2) / (2.0 * self.sigma**2))
         kernel /= torch.sum(kernel)
         kernel = kernel.view(1, 1, self.size, self.size).repeat(self.channels, 1, 1, 1)
 
         return kernel
 
-    def __call__(self):
+    def __call__(self) -> Tensor:
         return self.window
 
 
