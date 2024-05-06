@@ -9,13 +9,35 @@ import matplotlib.pyplot as plt
 
 # TODO: Implement SSIM class
 class SSIM(torch.nn.Module):
-    def __init__(self, window_size: int = 11, window_sigma: float = 1.5) -> None:
+    def __init__(
+        self,
+        window_size: int = 11,
+        window_sigma: float = 1.5,
+        channels: int = 3,
+        size_avarage: bool = True,
+        full: bool = False,
+        window_type: str = "2D",
+    ) -> None:
         super(SSIM, self).__init__()
         self.window_size: int = window_size
         self.window_sigma: float = window_sigma
+        self.channels: int = channels
+        self.size_avarage: bool = size_avarage
+        self.full: bool = full
+
+        if window_type == "1D":
+            self.window: Tensor = GaussianWindow1D(window_size, window_sigma)
+        elif window_type == "2D":
+            self.window: Tensor = GaussianWindow2D(window_size, window_sigma, channels)
+        else:
+            raise ValueError("Window type must be either '1D' or '2D'")
 
     # TODO: Implement forward method (SSIM calculation)
-    def forward(self, img1: Tensor, img2: Tensor) -> Tensor:
+    def forward(
+        self,
+        img1: Tensor,
+        img2: Tensor,
+    ) -> Tensor:
         pass
 
 
