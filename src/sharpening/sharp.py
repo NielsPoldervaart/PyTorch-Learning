@@ -43,7 +43,7 @@ sharpening.weight = nn.Parameter(kernel, requires_grad=False)
 sharpening_img = sharpening(img)
 
 # Define blending factor (0 = original image, 1 = sharpened image, 0.5 = average of both, higher = more sharpened)
-blend_factor = 0.5
+blend_factor = 1
 
 # Blend sharpened image with original image
 sharpening_img = torch.add(blend_factor * sharpening_img, (1 - blend_factor) * img)
