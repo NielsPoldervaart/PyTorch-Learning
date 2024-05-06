@@ -2,6 +2,7 @@ import torch
 from torchvision.transforms import v2
 from torch import Tensor
 from PIL import Image
+import matplotlib.pyplot as plt
 
 # TODO: Possibly implement MS-SSIM as well
 
@@ -33,15 +34,18 @@ class GaussianWindow1D:
         kernel /= torch.sum(kernel)
         kernel = kernel.view(1, 1, self.size, 1).repeat(1, 1, 1, 1)
 
+        return kernel
+
     def __call__(self):
         return self.window
 
 
 # Create a 2D Gaussian window for SSIM calculation
 class GaussianWindow2D:
-    def __init__(self, size, sigma):
+    def __init__(self, size, sigma, channels=3):
         self.size = size
         self.sigma = sigma
+        self.channels = channels
         self.window = self._create_window()
 
     def _create_window(self):
@@ -74,17 +78,47 @@ def preprocess_img(img_path):
     return preprocess(Image.open(img_path).convert("RGB")).unsqueeze(0)
 
 
+def visualize_kernels():
+    # Create a 1D Gaussian window
+    window1D = GaussianWindow1D(size=11, sigma=1.5)
+    kernel1D = window1D()
+
+    # Create a 2D Gaussian window
+    window2D = GaussianWindow2D(size=11, sigma=1.5)
+    kernel2D = window2D()
+
+    # Plot the 1D Gaussian kernel
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(kernel1D.view(-1).numpy())
+    plt.title("1D Gaussian Kernel")
+
+    # Plot the 2D Gaussian kernel
+    plt.subplot(1, 2, 2)
+    plt.imshow(
+        kernel2D[0, 0].numpy(),
+        cmap="hot",
+        interpolation="nearest",
+    )
+    plt.title("2D Gaussian Kernel")
+
+    plt.show()
+
+
 if __name__ == "__main__":
-    # Check if CUDA is available and set PyTorch to use GPU or CPU
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # # Check if CUDA is available and set PyTorch to use GPU or CPU
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Load and preprocess images
-    img1 = preprocess_img("./images/image1.jpg").to(device)
-    img2 = preprocess_img("./images/image2.jpg").to(device)
+    # # Load and preprocess images
+    # img1 = preprocess_img("./images/image1.jpg").to(device)
+    # img2 = preprocess_img("./images/image2.jpg").to(device)
 
-    # Calculate SSIM
-    result = SSIM()
-    # TODO: Calculate % similarity between the two images
+    # # Calculate SSIM
+    # result = SSIM()
+    # # TODO: Calculate % similarity between the two images
 
-    # Print final result
-    print(f"Result: {result}")
+    # # Print final result
+    # print(f"Result: {result}")
+
+    # Visualize 1D and 2D Gaussian kernels
+    visualize_kernels()
