@@ -1,17 +1,23 @@
 import torch
 from torchvision.transforms import v2
+from torch import Tensor
 from PIL import Image
 
 
 # TODO: Implement SSIM class
-class SSIM:
-    def __init__(self, window_size=11, sigma=1.5):
-        self.window_size = window_size
-        self.sigma = sigma
-        self.gaussian_window = GaussianWindow(window_size, sigma)
+class SSIM(torch.nn.Module):
+    def __init__(self, window_size=11, window_sigma=1.5, k1=0.01, k2=0.03):
+        super(SSIM, self).__init__()
+        self.window_size: float = window_size
+        self.window_sigma: float = window_sigma
+        self.k1: float = k1
+        self.k2: float = k2
 
     def __call__(self, img1, img2):
         pass
+
+    def forward(self, img1: Tensor, img2: Tensor) -> Tensor:
+        return ssim()
 
 
 # TODO: Implement Gaussian window for SSIM calculation
@@ -25,7 +31,12 @@ class GaussianWindow:
         pass
 
     def __call__(self):
-        return self.window
+        pass
+
+
+def ssim(img1, img2, window_size=11, window_sigma=1.5, k1=0.01, k2=0.03):
+    # Calculate SSIM
+    pass
 
 
 def preprocess_img(img_path):
