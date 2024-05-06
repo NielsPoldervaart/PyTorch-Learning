@@ -3,6 +3,8 @@ from torchvision.transforms import v2
 from torch import Tensor
 from PIL import Image
 
+# TODO: Possibly implement MS-SSIM as well
+
 
 # TODO: Implement SSIM class
 class SSIM(torch.nn.Module):
