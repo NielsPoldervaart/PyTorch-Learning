@@ -8,12 +8,10 @@ from PIL import Image
 
 # TODO: Implement SSIM class
 class SSIM(torch.nn.Module):
-    def __init__(self, window_size=11, window_sigma=1.5, k1=0.01, k2=0.03):
+    def __init__(self, window_size=11, window_sigma=1.5):
         super(SSIM, self).__init__()
         self.window_size: float = window_size
         self.window_sigma: float = window_sigma
-        self.k1: float = k1
-        self.k2: float = k2
 
     def __call__(self, img1, img2):
         pass
@@ -22,18 +20,41 @@ class SSIM(torch.nn.Module):
         return ssim()
 
 
-# TODO: Implement Gaussian window for SSIM calculation
-class GaussianWindow:
+# Create a 1D Gaussian window for SSIM calculation
+class GaussianWindow1D:
     def __init__(self, size, sigma):
         self.size = size
         self.sigma = sigma
         self.window = self._create_window()
 
     def _create_window(self):
-        pass
+        axis = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
+        kernel = torch.exp(-(axis**2) / (2.0 * self.sigma**2))
+        kernel /= torch.sum(kernel)
+        kernel = kernel.view(1, 1, self.size, 1).repeat(1, 1, 1, 1)
 
     def __call__(self):
-        pass
+        return self.window
+
+
+# Create a 2D Gaussian window for SSIM calculation
+class GaussianWindow2D:
+    def __init__(self, size, sigma):
+        self.size = size
+        self.sigma = sigma
+        self.window = self._create_window()
+
+    def _create_window(self):
+        axis = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
+        xx, yy = torch.meshgrid(axis, axis)
+        kernel = torch.exp(-(xx**2 + yy**2) / (2.0 * self.sigma**2))
+        kernel /= torch.sum(kernel)
+        kernel = kernel.view(1, 1, self.size, self.size).repeat(self.channels, 1, 1, 1)
+
+        return kernel
+
+    def __call__(self):
+        return self.window
 
 
 def ssim(img1, img2, window_size=11, window_sigma=1.5, k1=0.01, k2=0.03):
