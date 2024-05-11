@@ -15,7 +15,7 @@ class SSIM(torch.nn.Module):
         window_size: int = 11,
         window_sigma: float = 1.5,
         channels: int = 3,
-        size_avarage: bool = True,
+        size_average: bool = True,
         full: bool = False,
         window_type: str = "2D",
         device: str = "cpu",
@@ -24,7 +24,7 @@ class SSIM(torch.nn.Module):
         self.window_size: int = window_size
         self.window_sigma: float = window_sigma
         self.channels: int = channels
-        self.size_avarage: bool = size_avarage
+        self.size_average: bool = size_average
         self.full: bool = full
         self.device: str = device
 
@@ -157,13 +157,13 @@ def preprocess_img(img_path):
     return preprocess(Image.open(img_path).convert("RGB")).unsqueeze(0)
 
 
-def visualize_kernels():
+def visualize_kernels(device: str):
     # Create a 1D Gaussian window
-    window1D = GaussianWindow1D(size=11, sigma=1.5)
+    window1D = GaussianWindow1D(device, size=11, sigma=1.5)
     kernel1D = window1D()
 
     # Create a 2D Gaussian window
-    window2D = GaussianWindow2D(size=11, sigma=1.5)
+    window2D = GaussianWindow2D(device, size=11, sigma=1.5)
     kernel2D = window2D()
 
     # Plot the 1D Gaussian kernel
@@ -201,4 +201,4 @@ if __name__ == "__main__":
     print(f"Result: {result}")
 
     # Visualize 1D and 2D Gaussian kernels
-    visualize_kernels()
+    visualize_kernels(device)
