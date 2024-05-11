@@ -159,11 +159,11 @@ def preprocess_img(img_path):
 
 def visualize_kernels(device: str):
     # Create a 1D Gaussian window
-    window1D = GaussianWindow1D(device, size=11, sigma=1.5)
+    window1D = GaussianWindow1D(device="cpu", size=11, sigma=1.5)
     kernel1D = window1D()
 
     # Create a 2D Gaussian window
-    window2D = GaussianWindow2D(device, size=11, sigma=1.5)
+    window2D = GaussianWindow2D(device="cpu", size=11, sigma=1.5)
     kernel2D = window2D()
 
     # Plot the 1D Gaussian kernel
@@ -195,10 +195,9 @@ if __name__ == "__main__":
     # Calculate SSIM
     ssim_module = SSIM(window_size=11, window_sigma=1.5, device=device).to(device)
     result = ssim_module(img1, img2)
-    # TODO: Calculate % similarity between the two images
 
-    # Print final result
-    print(f"Result: {result}")
+    # Print final result as percentage
+    print(f"Result: {result.item() * 100:.2f}%")
 
     # Visualize 1D and 2D Gaussian kernels
     visualize_kernels(device)
