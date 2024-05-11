@@ -18,6 +18,7 @@ class SSIM(torch.nn.Module):
         size_avarage: bool = True,
         full: bool = False,
         window_type: str = "2D",
+        device: str = "cpu",
     ) -> None:
         super(SSIM, self).__init__()
         self.window_size: int = window_size
@@ -25,11 +26,14 @@ class SSIM(torch.nn.Module):
         self.channels: int = channels
         self.size_avarage: bool = size_avarage
         self.full: bool = full
+        self.device: str = device
 
         if window_type == "1D":
-            self.window: Tensor = GaussianWindow1D(window_size, window_sigma)
+            self.window: Tensor = GaussianWindow1D(device, window_size, window_sigma)()
         elif window_type == "2D":
-            self.window: Tensor = GaussianWindow2D(window_size, window_sigma, channels)
+            self.window: Tensor = GaussianWindow2D(
+                device, window_size, window_sigma, channels
+            )()
         else:
             raise ValueError("Window type must be either '1D' or '2D'")
 
@@ -101,10 +105,10 @@ class SSIM(torch.nn.Module):
 
 # Create a 1D Gaussian window for SSIM calculation
 class GaussianWindow1D:
-    def __init__(self, size: int, sigma: float) -> None:
+    def __init__(self, device: str, size: int, sigma: float) -> None:
         self.size: int = size
         self.sigma: float = sigma
-        self.window: Tensor = self._create_window()
+        self.window: Tensor = self._create_window().to(device)
 
     def _create_window(self) -> Tensor:
         axis: Tensor = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
@@ -120,11 +124,11 @@ class GaussianWindow1D:
 
 # Create a 2D Gaussian window for SSIM calculation
 class GaussianWindow2D:
-    def __init__(self, size: int, sigma: float, channels: int = 3) -> None:
+    def __init__(self, device: str, size: int, sigma: float, channels: int = 3) -> None:
         self.size: int = size
         self.sigma: float = sigma
         self.channels: int = channels
-        self.window: Tensor = self._create_window()
+        self.window: Tensor = self._create_window().to(device)
 
     def _create_window(self) -> Tensor:
         axis: Tensor = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
@@ -189,7 +193,7 @@ if __name__ == "__main__":
     img2 = preprocess_img("./images/image2.jpg").to(device)
 
     # Calculate SSIM
-    ssim_module = SSIM(window_size=11, window_sigma=1.5).to(device)
+    ssim_module = SSIM(window_size=11, window_sigma=1.5, device=device).to(device)
     result = ssim_module(img1, img2)
     # TODO: Calculate % similarity between the two images
 
