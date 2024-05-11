@@ -1,5 +1,6 @@
 import torch
 from torchvision.transforms import v2
+from torch.nn import functional as F
 from torch import Tensor
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -32,13 +33,70 @@ class SSIM(torch.nn.Module):
         else:
             raise ValueError("Window type must be either '1D' or '2D'")
 
-    # TODO: Implement forward method (SSIM calculation)
-    def forward(
-        self,
-        img1: Tensor,
-        img2: Tensor,
-    ) -> Tensor:
-        pass
+    def forward(self, img1: Tensor, img2: Tensor) -> Tensor:
+        # Calculate the mean (average) of the images
+        mu1 = F.conv2d(
+            img1, self.window, padding=self.window_size // 2, groups=self.channels
+        )
+        mu2 = F.conv2d(
+            img2, self.window, padding=self.window_size // 2, groups=self.channels
+        )
+
+        # Squares of the images
+        mu1_sq = mu1.pow(2)
+        mu2_sq = mu2.pow(2)
+        # Product of the images
+        mu1_mu2 = mu1 * mu2
+
+        # Calculate the variance of the images
+        sigma1_sq = (
+            F.conv2d(
+                img1 * img1,
+                self.window,
+                padding=self.window_size // 2,
+                groups=self.channels,
+            )
+            - mu1_sq
+        )
+        sigma2_sq = (
+            F.conv2d(
+                img2 * img2,
+                self.window,
+                padding=self.window_size // 2,
+                groups=self.channels,
+            )
+            - mu2_sq
+        )
+
+        # Calculate the covariance of the images
+        sigma12 = (
+            F.conv2d(
+                img1 * img2,
+                self.window,
+                padding=self.window_size // 2,
+                groups=self.channels,
+            )
+            - mu1_mu2
+        )
+
+        # Constants for stability
+        # TODO: Use dynamic range of the images (1 or 255) based on the input images
+        C1 = (0.01 * 255) ** 2
+        C2 = (0.03 * 255) ** 2
+
+        # Calculate the SSIM map
+        ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / (
+            (mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2)
+        )
+
+        # return the SSIM value
+        if self.size_average:
+            return ssim_map.mean()
+        elif self.full:
+            return ssim_map
+        else:
+            # Return the mean SSIM value for each channel (channels, height, width)
+            return ssim_map.mean([1, 2, 3])
 
 
 # Create a 1D Gaussian window for SSIM calculation
