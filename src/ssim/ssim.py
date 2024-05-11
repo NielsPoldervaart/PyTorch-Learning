@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     # Calculate SSIM
     ssim_module = SSIM(window_size=11, window_sigma=1.5).to(device)
-    result = 1 - SSIM(img1, img2)
+    result = ssim_module(img1, img2)
     # TODO: Calculate % similarity between the two images
 
     # Print final result
