@@ -134,7 +134,7 @@ class GaussianWindow2D:
         axis: Tensor = torch.arange(-self.size // 2 + 1.0, self.size // 2 + 1.0)
         xx: Tensor
         yy: Tensor
-        xx, yy = torch.meshgrid(axis, axis)
+        xx, yy = torch.meshgrid(axis, axis, indexing="xy")
         kernel: Tensor = torch.exp(-(xx**2 + yy**2) / (2.0 * self.sigma**2))
         kernel /= torch.sum(kernel)
         kernel = kernel.view(1, 1, self.size, self.size).repeat(self.channels, 1, 1, 1)
