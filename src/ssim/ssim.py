@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 # TODO: Possibly implement MS-SSIM as well
 
 
-# TODO: Implement SSIM class
 class SSIM(torch.nn.Module):
     def __init__(
         self,
@@ -157,7 +156,7 @@ def preprocess_img(img_path):
     return preprocess(Image.open(img_path).convert("RGB")).unsqueeze(0)
 
 
-def visualize_kernels(device: str):
+def visualize_kernels():
     # Create a 1D Gaussian window
     window1D = GaussianWindow1D(device="cpu", size=11, sigma=1.5)
     kernel1D = window1D()
@@ -184,6 +183,8 @@ def visualize_kernels(device: str):
     plt.show()
 
 
+# TODO: Implement heatmap visualization for SSIM map
+
 if __name__ == "__main__":
     # Check if CUDA is available and set PyTorch to use GPU or CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -200,4 +201,4 @@ if __name__ == "__main__":
     print(f"Result: {result.item() * 100:.2f}%")
 
     # Visualize 1D and 2D Gaussian kernels
-    visualize_kernels(device)
+    visualize_kernels()
